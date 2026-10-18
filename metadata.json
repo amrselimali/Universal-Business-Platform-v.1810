@@ -1,0 +1,6 @@
+{
+  "name": "Universal Business Platform",
+  "description": "Enterprise Cloud ERP Platform with Multi-Branch, Multi-Warehouse, Dynamic RBAC, Cairo Time, DbUp Migrations, and QA Test Control Center",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -76,16 +76,16 @@ export const DatabaseScreen: React.FC = () => {
         <div>
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <Database className="w-5 h-5 text-indigo-600" />
-            <span>{t('إدارة قاعدة البيانات والترحيلات (DbUp Migrations Runner)', 'Database & Migrations Manager')}</span>
+            <span>{t('إدارة قاعدة البيانات والتحديثات', 'Database & Updates')}</span>
           </h2>
           <div className="flex items-center gap-3 mt-1 text-xs">
             <span className="flex items-center gap-1.5 font-semibold text-emerald-600">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              <span>{t('متصل بالسيرفر (Cloud PostgreSQL)', 'Connected: Cloud PostgreSQL')}</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span>{t('متصل بالسيرفر السحابي', 'Connected to Cloud Server')}</span>
             </span>
             <span className="text-slate-300">|</span>
-            <span className="font-mono text-slate-500 text-[11px]">
-              Host: europe-west2.cloudsql &bull; db: ubp_production_cloud
+            <span className="text-slate-500 text-[11px]">
+              {t('قاعدة بيانات مركزية موحدة', 'Central Enterprise Database')}
             </span>
           </div>
         </div>
@@ -95,7 +95,7 @@ export const DatabaseScreen: React.FC = () => {
             onClick={() => setIsResetConfirmOpen(true)}
             className="px-3.5 py-2 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition-all"
           >
-            {t('إعادة تهيئة البيانات (Seed Reset)', 'Factory Seed Reset')}
+            {t('إعادة ضبط البيانات الأولية', 'Reset Initial Data')}
           </button>
           <button
             onClick={handleRunMigrations}
@@ -103,7 +103,7 @@ export const DatabaseScreen: React.FC = () => {
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50"
           >
             <Play className={`w-3.5 h-3.5 ${isMigrating ? 'animate-spin' : ''}`} />
-            <span>{t('تحديث / تهيئة قاعدة البيانات (Apply DbUp)', 'Apply Migrations & Seeds')}</span>
+            <span>{t('تحديث قاعدة البيانات', 'Update Database')}</span>
           </button>
         </div>
       </div>
@@ -113,7 +113,7 @@ export const DatabaseScreen: React.FC = () => {
         <div className="flex items-center justify-between border-b border-slate-100 pb-2">
           <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
             <Layers className="w-4 h-4 text-indigo-600" />
-            <span>{t('سكريبتات SQL المرقمة (DbUp Scripts)', 'Numbered SQL Migrations')}</span>
+            <span>{t('حزم التحديثات المنفذة', 'Executed Update Scripts')}</span>
           </h3>
           <span className="text-xs text-slate-500 font-mono">
             {migrations.filter((m) => m.status === 'APPLIED').length} / {migrations.length} {t('مطبقة', 'Applied')}
@@ -137,7 +137,7 @@ export const DatabaseScreen: React.FC = () => {
                 <button
                   onClick={() => setInspectSql(mig)}
                   className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded-lg"
-                  title={t('عرض كود SQL', 'View SQL')}
+                  title={t('عرض التفاصيل', 'View Details')}
                 >
                   <Code className="w-3.5 h-3.5" />
                 </button>
@@ -175,8 +175,8 @@ export const DatabaseScreen: React.FC = () => {
 
         <div className="lg:col-span-3 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-xs font-bold text-slate-800 font-mono">
-              SELECT * FROM {selectedTable} LIMIT 25;
+            <h4 className="text-xs font-bold text-slate-800">
+              {t('بيانات جدول:', 'Table Records:')} <span className="font-mono text-indigo-600">{selectedTable}</span>
             </h4>
             <span className="text-[11px] text-slate-400">
               {tableRows.length} {t('سجلات معروضة', 'rows loaded')}

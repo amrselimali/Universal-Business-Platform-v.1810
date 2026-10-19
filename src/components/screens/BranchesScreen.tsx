@@ -124,7 +124,7 @@ export const BranchesScreen: React.FC = () => {
       if (result.actionTaken === 'DEACTIVATED') {
         showInfo(
           t('تم تعطيل الفرع بدلاً من الحذف', 'Branch Deactivated Instead of Deleted'),
-          t('نظراً لارتباط الفرع بمخازن أو مستخدمين أو سجلات سابقة، تم تحويل الإجراء إلى تعطيل الحساب (is_active = false) لضمان سلامة البيانات.', 'Due to existing links, the branch was safely set to inactive.')
+          t('نظراً لارتباط الفرع بمخازن أو مستخدمين أو حركات سابقة، تم تحويل الإجراء إلى تعطيل الفرع لضمان سلامة وتكامل البيانات.', 'Due to existing links, the branch was safely set to inactive.')
         );
       } else {
         showSuccess(t('تم حذف الفرع نهائياً', 'Branch permanently deleted'));

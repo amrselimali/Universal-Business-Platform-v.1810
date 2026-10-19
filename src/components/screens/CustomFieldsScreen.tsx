@@ -142,9 +142,9 @@ export const CustomFieldsScreen: React.FC = () => {
         <div>
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <Sliders className="w-5 h-5 text-indigo-600" />
-            <span>{t('تعريف الحقول المخصصة (Custom Fields)', 'Custom Field Definitions')}</span>
+            <span>{t('تعريف الحقول الإضافية', 'Custom Fields')}</span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">{t('إضافة حقول ديناميكية للفروع والمخازن والمستخدمين دون تعديل الكود أو قاعدة البيانات', 'Define dynamic entity fields from the UI')}</p>
+          <p className="text-xs text-slate-500 mt-0.5">{t('إضافة حقول بيانات إضافية مخصصة للفروع والمخازن والمستخدمين', 'Define additional custom fields for entities')}</p>
         </div>
 
         {hasPermission(ScreenCodes.CUSTOM_FIELDS_MANAGEMENT, ActionCodes.ADD) && (
@@ -185,18 +185,17 @@ export const CustomFieldsScreen: React.FC = () => {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingField ? t('تعديل الحقل المخصص', 'Edit Custom Field') : t('إضافة حقل مخصص جديد', 'Add Custom Field')} maxWidth="md">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">{t('الكيان المستهدف', 'Target Entity')} *</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">{t('الكيان التابع له', 'Target Entity')} *</label>
             <select disabled={Boolean(editingField)} value={formData.entity_name} onChange={(e) => setFormData({ ...formData, entity_name: e.target.value as any })} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl disabled:bg-slate-50">
-              <option value="branches">{t('فروع الشركة (branches)', 'Branches')}</option>
-              <option value="warehouses">{t('المستودعات والمخازن (warehouses)', 'Warehouses')}</option>
-              <option value="users">{t('المستخدمين (users)', 'Users')}</option>
+              <option value="branches">{t('فروع الشركة', 'Branches')}</option>
+              <option value="warehouses">{t('المستودعات والمخازن', 'Warehouses')}</option>
+              <option value="users">{t('المستخدمين', 'Users')}</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">{t('مفتاح الحقل (field_key - أحرف إنجليزية صغيرة)', 'Field Key (lowercase)')} *</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">{t('رمز الحقل بالإنجليزية', 'Field Identifier')} *</label>
             <input type="text" required disabled={Boolean(editingField)} placeholder="e.g. tax_card, vat_id" value={formData.field_key} onChange={(e) => setFormData({ ...formData, field_key: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl font-mono disabled:bg-slate-50" />
-            <p className="text-[10px] text-slate-400 mt-0.5">CHECK (field_key ~ '^[a-z][a-z0-9_]*$')</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -213,11 +212,11 @@ export const CustomFieldsScreen: React.FC = () => {
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">{t('نوع البيانات', 'Data Type')}</label>
             <select value={formData.data_type} onChange={(e) => setFormData({ ...formData, data_type: e.target.value as any })} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl">
-              <option value="text">{t('نص (text)', 'Text')}</option>
-              <option value="number">{t('رقم (number)', 'Number')}</option>
-              <option value="date">{t('تاريخ (date)', 'Date')}</option>
-              <option value="bool">{t('قيمة منطقية (bool - نعم/لا)', 'Boolean')}</option>
-              <option value="list">{t('قائمة خيارات منسدلة (list)', 'Dropdown List')}</option>
+              <option value="text">{t('نص', 'Text')}</option>
+              <option value="number">{t('رقم', 'Number')}</option>
+              <option value="date">{t('تاريخ', 'Date')}</option>
+              <option value="bool">{t('قيمة منطقية (نعم/لا)', 'Boolean')}</option>
+              <option value="list">{t('قائمة خيارات منسدلة', 'Dropdown List')}</option>
             </select>
           </div>
 

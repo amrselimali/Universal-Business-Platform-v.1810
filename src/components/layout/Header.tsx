@@ -60,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenChangePas
               className="flex items-center gap-2 px-3 py-1.5 bg-slate-100/80 hover:bg-slate-200/70 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 transition-all"
             >
               <Building2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-              <span className="truncate max-w-[160px] sm:max-w-[220px]">
+              <span>
                 {currentBranch
                   ? t(currentBranch.name_ar, currentBranch.name_en || currentBranch.name_ar)
                   : t('كافة الفروع', 'All Branches')}
@@ -125,7 +125,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar, onOpenChangePas
         {/* Cairo Time Indicator */}
         <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/70 text-xs font-mono text-slate-600">
           <Clock className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-          <span title={t('توقيت القاهرة (UTC+2/UTC+3)', 'Cairo Time')}>
+          <span title={t('توقيت القاهرة', 'Cairo Local Time')}>
             {cairoTime}
           </span>
         </div>

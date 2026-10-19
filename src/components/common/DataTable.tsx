@@ -17,6 +17,7 @@ interface DataTableProps<T> {
   totalCount: number;
   currentPage: number;
   pageSize?: number;
+  onPageSizeChange?: (newSize: number) => void;
   onPageChange: (page: number) => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
@@ -35,6 +36,7 @@ export function DataTable<T extends { id: string | number }>({
   totalCount,
   currentPage,
   pageSize = 25,
+  onPageSizeChange,
   onPageChange,
   searchQuery,
   onSearchChange,
@@ -75,9 +77,21 @@ export function DataTable<T extends { id: string | number }>({
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             </button>
           )}
-          <span className="text-xs text-slate-500 font-medium px-2 py-1 bg-white border border-slate-200 rounded-lg">
-            {t('الحد الأقصى: 25 سجل', 'Max: 25 rows')}
-          </span>
+
+          <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-white border border-slate-200 px-2.5 py-1.5 rounded-xl shadow-xs">
+            <span>{t('عدد الصفوف:', 'Rows:')}</span>
+            <select
+              value={pageSize}
+              onChange={(e) => onPageSizeChange?.(Number(e.target.value))}
+              disabled={!onPageSizeChange}
+              className="font-bold text-indigo-700 bg-transparent focus:outline-none cursor-pointer"
+            >
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={300}>300 {t('(سعة كاملة)', '(capacity)')}</option>
+            </select>
+          </div>
         </div>
       </div>
 

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Copy, Shield, ShieldCheck, CheckSquare, Square } from 'lucide-react';
+import { Plus, Edit2, Trash2, Copy, ShieldCheck } from 'lucide-react';
 import { Role, RolePermission } from '../../types/entities';
 import { ScreenCodes, ActionCodes, APP_SCREENS } from '../../types/permissions';
 import { RoleService } from '../../services/roleService';
 import { DataTable, Column } from '../common/DataTable';
 import { Modal } from '../common/Modal';
 import { ConfirmDialog } from '../common/ConfirmDialog';
+import { RoleFormModal } from './RoleFormModal';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useNotification } from '../../context/NotificationContext';
@@ -80,10 +81,7 @@ export const RolesScreen: React.FC = () => {
       } else {
         return {
           ...prev,
-          permissions: [
-            ...prev.permissions,
-            { screen_code: screenCode, action_code: actionCode, is_allowed: true, scope: 1 },
-          ],
+          permissions: [...prev.permissions, { screen_code: screenCode, action_code: actionCode, is_allowed: true, scope: 1 }],
         };
       }
     });
@@ -180,9 +178,9 @@ export const RolesScreen: React.FC = () => {
         <div>
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-indigo-600" />
-            <span>{t('إدارة الأدوار والصلاحيات (Roles & RBAC)', 'Roles & Permissions')}</span>
+            <span>{t('إدارة الأدوار والصلاحيات', 'Roles & Permissions')}</span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">{t('تعريف الأدوار الوظيفية، تحديد مصفوفة الصلاحيات ونطاق الوصول لكل شاشة وزرار', 'Define functional roles and action scopes')}</p>
+          <p className="text-xs text-slate-500 mt-0.5">{t('تعريف الأدوار الوظيفية، وتحديد الصلاحيات ونطاق الوصول لكل شاشة', 'Define functional roles and access scopes')}</p>
         </div>
 
         {hasPermission(ScreenCodes.ROLES_MANAGEMENT, ActionCodes.ADD) && (
@@ -222,74 +220,18 @@ export const RolesScreen: React.FC = () => {
         )}
       />
 
-      {/* Add / Edit Role Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingRole ? t('تعديل بيانات الدور ومصفوفة صلاحياته', 'Edit Role & Permissions') : t('إضافة دور جديد', 'Add New Role')} maxWidth="3xl">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">{t('كود الدور (فريد)', 'Role Code')} *</label>
-              <input type="text" required value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">{t('الاسم بالعربية', 'Arabic Name')} *</label>
-              <input type="text" required value={formData.name_ar} onChange={(e) => setFormData({ ...formData, name_ar: e.target.value })} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1">{t('الاسم بالإنجليزية', 'English Name')}</label>
-              <input type="text" value={formData.name_en} onChange={(e) => setFormData({ ...formData, name_en: e.target.value })} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
-            </div>
-          </div>
-
-          {/* Permissions Matrix */}
-          <div className="space-y-3 pt-3 border-t border-slate-100 max-h-[50vh] overflow-y-auto pe-1">
-            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">{t('مصفوفة الصلاحيات ونطاق الوصول (سجلاتي 0 / فروعي 1 / الكل 2)', 'Permissions & Scope Matrix')}</h4>
-            {APP_SCREENS.map((screen) => (
-              <div key={screen.code} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                <div className="flex items-center justify-between border-b border-slate-200/60 pb-1.5">
-                  <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <Shield className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>{t(screen.name_ar, screen.name_en)}</span>
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <button type="button" onClick={() => handleSelectAllForScreen(screen.code, true)} className="px-2 py-0.5 text-[11px] font-medium text-indigo-600 hover:bg-white rounded">{t('تحديد الكل', 'Select All')}</button>
-                    <span className="text-slate-300">|</span>
-                    <button type="button" onClick={() => handleSelectAllForScreen(screen.code, false)} className="px-2 py-0.5 text-[11px] font-medium text-slate-500 hover:bg-white rounded">{t('إلغاء الكل', 'Deselect')}</button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {screen.actions.map((act) => {
-                    const perm = formData.permissions.find((p) => p.screen_code === screen.code && p.action_code === act.code);
-                    const isChecked = Boolean(perm?.is_allowed);
-
-                    return (
-                      <div key={act.code} className={`p-2 rounded-lg border text-xs flex items-center justify-between gap-2 transition-all ${isChecked ? 'bg-indigo-50/60 border-indigo-200' : 'bg-white border-slate-200'}`}>
-                        <div onClick={() => handleToggleAction(screen.code, act.code)} className="flex items-center gap-2 cursor-pointer flex-1">
-                          {isChecked ? <CheckSquare className="w-4 h-4 text-indigo-600 shrink-0" /> : <Square className="w-4 h-4 text-slate-300 shrink-0" />}
-                          <span className="font-medium text-slate-700">{t(act.label_ar, act.label_en)}</span>
-                        </div>
-
-                        {isChecked && (
-                          <select value={perm?.scope ?? 1} onChange={(e) => handleScopeChange(screen.code, act.code, Number(e.target.value) as 0 | 1 | 2)} className="text-[11px] px-1.5 py-0.5 bg-white border border-slate-200 rounded font-semibold text-slate-700">
-                            <option value={0}>{t('سجلاتي (0)', 'My (0)')}</option>
-                            <option value={1}>{t('فروعي (1)', 'Branch (1)')}</option>
-                            <option value={2}>{t('الكل (2)', 'All (2)')}</option>
-                          </select>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
-            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">{t('إلغاء', 'Cancel')}</button>
-            <button type="submit" className="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-xs">{t('حفظ الدور', 'Save Role')}</button>
-          </div>
-        </form>
-      </Modal>
+      {/* Role Form Modal */}
+      <RoleFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+        editingRole={editingRole}
+        formData={formData}
+        setFormData={setFormData}
+        onToggleAction={handleToggleAction}
+        onScopeChange={handleScopeChange}
+        onSelectAllForScreen={handleSelectAllForScreen}
+      />
 
       {/* Copy Role Modal */}
       <Modal isOpen={Boolean(copyTargetRole)} onClose={() => setCopyTargetRole(null)} title={`${t('استنساخ الدور:', 'Clone Role:')} ${copyTargetRole?.name_ar}`} maxWidth="sm">

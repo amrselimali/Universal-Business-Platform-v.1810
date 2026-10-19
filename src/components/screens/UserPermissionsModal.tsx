@@ -123,7 +123,7 @@ export const UserPermissionsModal: React.FC<UserPermissionsModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={`${t('صلاحيات المستخدم المخصصة:', 'Custom Permissions for:')} ${targetUser.name || targetUser.username}`}
-      subtitle={t('تحديد الاستثناءات الفردية لكل زرار وشاشة وتعيين نطاق الصلاحية (سجلاتي/فروعي/الكل)', 'Configure explicit overrides and scope')}
+      subtitle={t('تحديد الصلاحيات الفردية وتعيين نطاق الوصول لكل شاشة وإجراء', 'Configure individual permissions and access scope')}
       maxWidth="3xl"
     >
       <div className="space-y-4">
@@ -240,9 +240,9 @@ export const UserPermissionsModal: React.FC<UserPermissionsModalProps> = ({
                             }
                             className="text-[11px] px-1.5 py-0.5 bg-white border border-slate-200 rounded font-semibold text-slate-700"
                           >
-                            <option value={0}>{t('سجلاتي (0)', 'My Records (0)')}</option>
-                            <option value={1}>{t('فروعي (1)', 'My Branches (1)')}</option>
-                            <option value={2}>{t('الكل (2)', 'All (2)')}</option>
+                            <option value={0}>{t('سجلاتي فقط', 'My Records')}</option>
+                            <option value={1}>{t('فروعي المصرح بها', 'My Branches')}</option>
+                            <option value={2}>{t('كافة الفروع والبيانات', 'All Records')}</option>
                           </select>
                         )}
                       </div>

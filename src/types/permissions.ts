@@ -136,7 +136,7 @@ export const APP_SCREENS: ScreenMetadata[] = [
   },
   {
     code: ScreenCodes.AUDIT_LOG_VIEW,
-    name_ar: 'سجل الأنشطة والأمان (Audit Log)',
+    name_ar: 'سجل الأنشطة والأمان',
     name_en: 'Audit & Security Log',
     icon: 'FileText',
     actions: [
@@ -146,8 +146,8 @@ export const APP_SCREENS: ScreenMetadata[] = [
   },
   {
     code: ScreenCodes.DB_MANAGEMENT,
-    name_ar: 'إدارة قاعدة البيانات (DbUp)',
-    name_en: 'Database & Migrations',
+    name_ar: 'إدارة قاعدة البيانات',
+    name_en: 'Database & Updates',
     icon: 'Database',
     superAdminOnly: true,
     actions: [
@@ -160,8 +160,8 @@ export const APP_SCREENS: ScreenMetadata[] = [
   },
   {
     code: ScreenCodes.QA_CONTROL_CENTER,
-    name_ar: 'مركز اختبارات الجودة QA Control Center',
-    name_en: 'QA & Test Control Center v2.2',
+    name_ar: 'مركز اختبارات الجودة',
+    name_en: 'QA & Test Control Center',
     icon: 'CheckCheck',
     actions: [
       { code: ActionCodes.VIEW, label_ar: 'عرض مصفوفة الاختبارات', label_en: 'View Matrix' },

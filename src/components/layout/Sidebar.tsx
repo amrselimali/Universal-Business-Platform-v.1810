@@ -59,34 +59,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
   });
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-slate-900 text-slate-300">
-      {/* Brand Header */}
-      <div className="h-16 px-5 flex items-center justify-between border-b border-slate-800 bg-slate-950/40">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-400 text-white flex items-center justify-center font-black shadow-md shadow-indigo-500/20">
+    <div className="flex flex-col h-full bg-white text-slate-700 border-e border-slate-200/80">
+      {/* Brand Header - Full company name without ellipsis */}
+      <div className="min-h-16 py-3.5 px-4 flex items-center justify-between border-b border-slate-100 bg-slate-50/70">
+        <div className="flex items-start gap-3 w-full">
+          <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black shadow-xs shrink-0 mt-0.5">
             <Layers className="w-5 h-5" />
           </div>
-          <div>
-            <h1 className="text-sm font-bold text-white tracking-wide truncate max-w-[170px]">
+          <div className="flex-1 min-w-0 pe-1">
+            <h1 className="text-xs sm:text-sm font-bold text-slate-900 leading-snug break-words">
               {settings.company_name}
             </h1>
-            <p className="text-[10px] text-indigo-400 font-mono tracking-wider">
-              {t('منظومة ERP السحابية', 'Cloud ERP Platform')}
+            <p className="text-[10px] text-indigo-600 font-medium mt-0.5">
+              {t('منظومة ERP السحابية المتكاملة', 'Cloud ERP Platform')}
             </p>
           </div>
         </div>
 
         <button
           onClick={onCloseMobile}
-          className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg transition-colors"
+          className="lg:hidden p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors shrink-0"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Navigation List */}
+      {/* Navigation List - Calming light colors */}
       <div className="flex-1 py-4 px-3 overflow-y-auto space-y-1">
-        <div className="px-3 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+        <div className="px-3 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
           {t('الشاشات والوحدات', 'Modules & Screens')}
         </div>
 
@@ -103,18 +103,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-start group ${
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
+                  ? 'bg-indigo-600 text-white shadow-xs font-bold'
+                  : 'text-slate-600 hover:text-indigo-600 hover:bg-slate-100/70'
               }`}
             >
               <IconComponent
-                className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
-                  isActive ? 'text-white' : 'text-slate-400 group-hover:text-indigo-400'
+                className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-105 ${
+                  isActive ? 'text-white' : 'text-slate-400 group-hover:text-indigo-600'
                 }`}
               />
               <span className="truncate flex-1">{t(screen.name_ar, screen.name_en)}</span>
               {screen.superAdminOnly && (
-                <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                <span
+                  className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                    isActive
+                      ? 'bg-white/20 text-white'
+                      : 'bg-amber-50 text-amber-700 border border-amber-200'
+                  }`}
+                >
                   Super
                 </span>
               )}
@@ -124,14 +130,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* System Footer info */}
-      <div className="p-4 border-t border-slate-800 bg-slate-950/30 text-[11px] text-slate-500">
+      <div className="p-3.5 border-t border-slate-100 bg-slate-50/50 text-[11px] text-slate-500">
         <div className="flex items-center justify-between">
-          <span>{t('إصدار النظام', 'Version')}</span>
-          <span className="font-mono text-slate-400">v2.2-cloud</span>
+          <span>{t('إصدار المنظومة', 'System Version')}</span>
+          <span className="font-mono text-slate-600 font-medium">v2.2-cloud</span>
         </div>
         <div className="flex items-center justify-between mt-1 text-[10px]">
-          <span>{t('المستخدمين المتزامنين', 'Capacity')}</span>
-          <span className="text-emerald-400 font-medium">100 {t('مستخدم متزامن', 'concurrent')}</span>
+          <span>{t('حالة الاتصال', 'Status')}</span>
+          <span className="text-emerald-600 font-semibold flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+            {t('متصل ونشط', 'Active')}
+          </span>
         </div>
       </div>
     </div>
@@ -139,8 +148,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Desktop Permanent Sidebar */}
-      <aside className="hidden lg:block w-64 h-screen sticky top-0 shrink-0 border-e border-slate-800 z-20">
+      {/* Desktop Permanent Sidebar with light styling */}
+      <aside className="hidden lg:block w-72 h-screen sticky top-0 shrink-0 z-20">
         {sidebarContent}
       </aside>
 
@@ -148,10 +157,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {isOpenMobile && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity animate-in fade-in"
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity animate-in fade-in"
             onClick={onCloseMobile}
           />
-          <div className="fixed inset-y-0 start-0 w-72 max-w-[85vw] shadow-2xl z-10 animate-in slide-in-from-start duration-200">
+          <div className="fixed inset-y-0 start-0 w-80 max-w-[85vw] shadow-2xl z-10 animate-in slide-in-from-start duration-200">
             {sidebarContent}
           </div>
         </div>

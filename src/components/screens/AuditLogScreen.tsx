@@ -79,10 +79,10 @@ export const AuditLogScreen: React.FC = () => {
       <div>
         <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
           <FileText className="w-5 h-5 text-indigo-600" />
-          <span>{t('سجل الأنشطة والأمان (Audit Log - Keyset Pagination)', 'Audit & Security Log')}</span>
+          <span>{t('سجل الأنشطة والأمان', 'Audit & Security Log')}</span>
         </h2>
         <p className="text-xs text-slate-500 mt-0.5">
-          {t('سجل غير قابل للتعديل أو الحذف، يعمل بترقيم Keyset السريع (WHERE id < @last_id LIMIT 25)', 'Immutable audit log with zero-offset Keyset ordering')}
+          {t('سجل شامل غير قابل للتعديل أو الحذف لمتابعة العمليات والأمان بالمنظومة', 'Immutable audit log for tracking all platform operations')}
         </p>
       </div>
 
@@ -172,10 +172,10 @@ export const AuditLogScreen: React.FC = () => {
           </table>
         </div>
 
-        {/* Keyset Pagination Bar */}
+        {/* Pagination Bar */}
         <div className="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 bg-slate-50/40">
           <div>
-            {t(`صفحة Keyset رقم ${pageIndex + 1} (الحد الأقصى 25 سجل في الدفعة)`, `Keyset Batch #${pageIndex + 1} (25 items max)`)}
+            {t(`الصفحة رقم ${pageIndex + 1}`, `Page #${pageIndex + 1}`)}
           </div>
           <div className="flex items-center gap-2">
             <button onClick={handlePrevPage} disabled={pageIndex === 0} className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-all">
@@ -189,7 +189,7 @@ export const AuditLogScreen: React.FC = () => {
       </div>
 
       {/* Side-by-side JSON Diff Modal */}
-      <Modal isOpen={Boolean(inspectLog)} onClose={() => setInspectLog(null)} title={`${t('تفاصيل السجل والمقارنة (Diff) - سجل رقم', 'Audit Record Diff - #')}${inspectLog?.id}`} maxWidth="4xl">
+      <Modal isOpen={Boolean(inspectLog)} onClose={() => setInspectLog(null)} title={`${t('تفاصيل السجل والتغييرات - سجل رقم ', 'Audit Record Details - #')}${inspectLog?.id}`} maxWidth="4xl">
         {inspectLog && (
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">

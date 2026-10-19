@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Plus,
-  Edit2,
-  Trash2,
-  Unlock,
-  Key,
-  Shield,
-  Check,
-  X,
-  Users as UsersIcon,
-  ShieldAlert,
-} from 'lucide-react';
+import { Plus, Edit2, Trash2, Unlock, Key, Shield, Check, X, Users as UsersIcon, ShieldAlert } from 'lucide-react';
 import { User, Branch, Warehouse, Role } from '../../types/entities';
 import { ScreenCodes, ActionCodes } from '../../types/permissions';
 import { UserService } from '../../services/userService';
@@ -19,9 +8,10 @@ import { WarehouseService } from '../../services/warehouseService';
 import { RoleService } from '../../services/roleService';
 import { AuthService } from '../../services/authService';
 import { DataTable, Column } from '../common/DataTable';
-import { Modal } from '../common/Modal';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { UserPermissionsModal } from './UserPermissionsModal';
+import { UserFormModal } from './UserFormModal';
+import { UserResetPasswordModal } from './UserResetPasswordModal';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useNotification } from '../../context/NotificationContext';
@@ -56,19 +46,16 @@ export const UsersScreen: React.FC = () => {
     roleIds: [] as string[],
   });
 
-  // Permissions modal
   const [permTargetUser, setPermTargetUser] = useState<User | null>(null);
-
-  // Reset password modal
   const [resetTargetUser, setResetTargetUser] = useState<User | null>(null);
   const [newPassword, setNewPassword] = useState('');
-
-  // Delete target
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+
+  const [pageSize, setPageSize] = useState(25);
 
   const loadData = () => {
     if (!currentUser) return;
-    const res = UserService.getPaginated(currentUser, page, 25, search, sortBy, sortAsc);
+    const res = UserService.getPaginated(currentUser, page, pageSize, search, sortBy, sortAsc);
     setUsers(res.items);
     setTotalCount(res.totalCount);
     setBranches(BranchService.getAll());
@@ -78,38 +65,25 @@ export const UsersScreen: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, [page, search, sortBy, sortAsc, currentUser]);
+  }, [page, pageSize, search, sortBy, sortAsc, currentUser]);
 
   const handleOpenAdd = () => {
     setEditingUser(null);
     setFormData({
-      name: '',
-      username: '',
-      password: '',
-      language: 'ar',
-      is_admin: false,
+      name: '', username: '', password: '', language: 'ar', is_admin: false,
       branchSelections: branches[0] ? [{ branchId: branches[0].id, isDefault: true }] : [],
-      warehouseIds: [],
-      roleIds: [],
+      warehouseIds: [], roleIds: [],
     });
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (target: User) => {
     setEditingUser(target);
-    const userBranches = UserService.getUserBranches(target.id);
-    const userWhs = UserService.getUserWarehouses(target.id);
-    const userRoles = UserService.getUserRoles(target.id);
-
     setFormData({
-      name: target.name || '',
-      username: target.username,
-      password: '',
-      language: target.language,
-      is_admin: target.is_admin,
-      branchSelections: userBranches.map((ub) => ({ branchId: ub.branch_id, isDefault: ub.is_default })),
-      warehouseIds: userWhs,
-      roleIds: userRoles,
+      name: target.name || '', username: target.username, password: '', language: target.language, is_admin: target.is_admin,
+      branchSelections: UserService.getUserBranches(target.id).map((ub) => ({ branchId: ub.branch_id, isDefault: ub.is_default })),
+      warehouseIds: UserService.getUserWarehouses(target.id),
+      roleIds: UserService.getUserRoles(target.id),
     });
     setIsModalOpen(true);
   };
@@ -207,11 +181,9 @@ export const UsersScreen: React.FC = () => {
       header_ar: 'النوع والصلاحية',
       header_en: 'Role / Type',
       render: (u) => (
-        <div className="flex items-center gap-1">
-          {u.is_super_admin && <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-amber-100 text-amber-800 border border-amber-300">Super Admin</span>}
-          {u.is_admin && !u.is_super_admin && <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-indigo-100 text-indigo-800 border border-indigo-200">Admin</span>}
-          {!u.is_admin && <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-slate-100 text-slate-600">Standard</span>}
-        </div>
+        <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${u.is_super_admin ? 'bg-amber-100 text-amber-800 border border-amber-300' : u.is_admin ? 'bg-indigo-100 text-indigo-800 border border-indigo-200' : 'bg-slate-100 text-slate-600'}`}>
+          {u.is_super_admin ? 'Super Admin' : u.is_admin ? 'Admin' : 'Standard'}
+        </span>
       ),
     },
     {
@@ -222,18 +194,12 @@ export const UsersScreen: React.FC = () => {
         const isLocked = u.locked_until && new Date(u.locked_until) > new Date();
         return isLocked ? (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-300 animate-pulse">
-            <ShieldAlert className="w-3 h-3" />
-            <span>{t('مقفل مؤقتاً', 'Locked')}</span>
-          </span>
-        ) : u.is_active ? (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <Check className="w-3 h-3" />
-            <span>{t('نشط', 'Active')}</span>
+            <ShieldAlert className="w-3 h-3" /><span>{t('مقفل مؤقتاً', 'Locked')}</span>
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600">
-            <X className="w-3 h-3" />
-            <span>{t('معطل', 'Inactive')}</span>
+          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${u.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600'}`}>
+            {u.is_active ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+            <span>{t(u.is_active ? 'نشط' : 'معطل', u.is_active ? 'Active' : 'Inactive')}</span>
           </span>
         );
       },
@@ -265,7 +231,8 @@ export const UsersScreen: React.FC = () => {
         data={users}
         totalCount={totalCount}
         currentPage={page}
-        pageSize={25}
+        pageSize={pageSize}
+        onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(1); }}
         onPageChange={setPage}
         searchQuery={search}
         onSearchChange={(q) => { setSearch(q); setPage(1); }}
@@ -310,159 +277,30 @@ export const UsersScreen: React.FC = () => {
         }}
       />
 
-      {/* Add / Edit User Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingUser ? t('تعديل بيانات المستخدم', 'Edit User') : t('إضافة مستخدم جديد', 'Add User')} maxWidth="2xl">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">{t('الاسم الكامل', 'Full Name')} *</label>
-              <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">{t('اسم المستخدم (فريد)', 'Username')} *</label>
-              <input type="text" required value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
-            </div>
-            {!editingUser && (
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">{t('كلمة المرور الأولية', 'Initial Password')} *</label>
-                <input type="password" required value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="Min 8 characters" className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
-              </div>
-            )}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">{t('اللغة الافتراضية', 'Language')}</label>
-              <select value={formData.language} onChange={(e) => setFormData({ ...formData, language: e.target.value as 'ar' | 'en' })} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl">
-                <option value="ar">العربية (Arabic)</option>
-                <option value="en">English</option>
-              </select>
-            </div>
-          </div>
-
-          <label className="flex items-center gap-2 cursor-pointer pt-1">
-            <input type="checkbox" checked={formData.is_admin} onChange={(e) => setFormData({ ...formData, is_admin: e.target.checked })} className="w-4 h-4 rounded text-indigo-600 border-slate-300" />
-            <span className="text-xs font-bold text-indigo-700">{t('تعيين كمدير نظام (Admin) - يتجاوز فحص الصلاحيات', 'Set as Administrator (Bypasses RBAC)')}</span>
-          </label>
-
-          {/* Branch Assignments */}
-          <div className="space-y-2 pt-2 border-t border-slate-100">
-            <label className="block text-xs font-semibold text-slate-700">{t('فروع المستخدم والفرع الافتراضي:', 'User Branches & Default Branch:')}</label>
-            <div className="space-y-1.5 max-h-36 overflow-y-auto p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
-              {branches.map((b) => {
-                const isSelected = formData.branchSelections.some((bs) => bs.branchId === b.id);
-                const isDefault = formData.branchSelections.find((bs) => bs.branchId === b.id)?.isDefault ?? false;
-
-                return (
-                  <div key={b.id} className="flex items-center justify-between p-1.5 rounded-lg bg-white border border-slate-100">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            const makeDefault = formData.branchSelections.length === 0;
-                            setFormData({ ...formData, branchSelections: [...formData.branchSelections, { branchId: b.id, isDefault: makeDefault }] });
-                          } else {
-                            setFormData({ ...formData, branchSelections: formData.branchSelections.filter((bs) => bs.branchId !== b.id) });
-                          }
-                        }}
-                        className="w-4 h-4 rounded text-indigo-600 border-slate-300"
-                      />
-                      <span className="font-medium text-slate-800">{t(b.name_ar, b.name_en || b.name_ar)}</span>
-                    </label>
-
-                    {isSelected && (
-                      <label className="flex items-center gap-1.5 text-[11px] text-slate-600 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="default_branch"
-                          checked={isDefault}
-                          onChange={() => {
-                            setFormData({
-                              ...formData,
-                              branchSelections: formData.branchSelections.map((bs) => ({ ...bs, isDefault: bs.branchId === b.id })),
-                            });
-                          }}
-                          className="w-3.5 h-3.5 text-indigo-600"
-                        />
-                        <span>{t('الفرع الافتراضي', 'Default Branch')}</span>
-                      </label>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Warehouse Assignments (with trigger check info) */}
-          <div className="space-y-2 pt-2 border-t border-slate-100">
-            <label className="block text-xs font-semibold text-slate-700">{t('المستودعات المصرح للمستخدم بالعمل عليها:', 'Permitted Warehouses:')}</label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-36 overflow-y-auto p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs">
-              {warehouses.map((w) => {
-                const checked = formData.warehouseIds.includes(w.id);
-                return (
-                  <label key={w.id} className="flex items-center gap-2 p-1.5 rounded-lg bg-white border border-slate-100 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={(e) => {
-                        if (e.target.checked) setFormData({ ...formData, warehouseIds: [...formData.warehouseIds, w.id] });
-                        else setFormData({ ...formData, warehouseIds: formData.warehouseIds.filter((id) => id !== w.id) });
-                      }}
-                      className="w-4 h-4 rounded text-indigo-600 border-slate-300"
-                    />
-                    <span className="font-medium text-slate-700">{t(w.name_ar, w.name_en || w.name_ar)}</span>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Roles Selection */}
-          <div className="space-y-2 pt-2 border-t border-slate-100">
-            <label className="block text-xs font-semibold text-slate-700">{t('الأدوار الإدارية المرتبطة:', 'Assigned Roles:')}</label>
-            <div className="flex flex-wrap gap-2">
-              {roles.map((r) => {
-                const checked = formData.roleIds.includes(r.id);
-                return (
-                  <label key={r.id} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs cursor-pointer transition-all ${checked ? 'bg-indigo-50 border-indigo-300 text-indigo-800 font-bold' : 'bg-slate-50 border-slate-200 text-slate-700'}`}>
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={(e) => {
-                        if (e.target.checked) setFormData({ ...formData, roleIds: [...formData.roleIds, r.id] });
-                        else setFormData({ ...formData, roleIds: formData.roleIds.filter((id) => id !== r.id) });
-                      }}
-                      className="w-3.5 h-3.5 rounded text-indigo-600"
-                    />
-                    <span>{t(r.name_ar, r.name_en || r.name_ar)}</span>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
-            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">{t('إلغاء', 'Cancel')}</button>
-            <button type="submit" className="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-xs">{t('حفظ المستخدم', 'Save User')}</button>
-          </div>
-        </form>
-      </Modal>
+      {/* User Form Modal (Modular sub-component under 300 lines) */}
+      <UserFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+        editingUser={editingUser}
+        formData={formData}
+        setFormData={setFormData}
+        branches={branches}
+        warehouses={warehouses}
+        roles={roles}
+      />
 
       {/* Permissions Matrix Modal */}
       <UserPermissionsModal isOpen={Boolean(permTargetUser)} onClose={() => setPermTargetUser(null)} targetUser={permTargetUser} />
 
       {/* Reset Password Modal */}
-      <Modal isOpen={Boolean(resetTargetUser)} onClose={() => setResetTargetUser(null)} title={`${t('إعادة تعيين كلمة المرور لـ:', 'Reset Password for:')} ${resetTargetUser?.username}`} maxWidth="sm">
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">{t('كلمة المرور الجديدة', 'New Password')}</label>
-            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="••••••••" className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
-          </div>
-          <div className="flex items-center justify-end gap-2 pt-2">
-            <button onClick={() => setResetTargetUser(null)} className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">{t('إلغاء', 'Cancel')}</button>
-            <button onClick={handleResetPassword} className="px-4 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-xs">{t('تعيين كلمة المرور', 'Set Password')}</button>
-          </div>
-        </div>
-      </Modal>
+      <UserResetPasswordModal
+        user={resetTargetUser}
+        newPassword={newPassword}
+        onPasswordChange={setNewPassword}
+        onClose={() => setResetTargetUser(null)}
+        onSubmit={handleResetPassword}
+      />
 
       <ConfirmDialog isOpen={Boolean(deleteTargetId)} onClose={() => setDeleteTargetId(null)} onConfirm={handleConfirmDelete} title={t('تأكيد حذف أو تعطيل المستخدم', 'Confirm User Removal')} message={t('هل أنت متأكد من رغبتك في حذف هذا الحساب؟ إذا كان للمستخدم أي سجلات أو عمليات سابقة فسيتم تحويل الإجراء إلى تعطيل الحساب لحفظ السجلات.', 'Are you sure you want to remove this user? It will be safely deactivated if records exist.')} />
     </div>
